@@ -8,12 +8,12 @@ let
   theme = import ./theme.nix args;
 
 in {
-  options.stylix.targets.gnome.enable =
+    options.stylix.targets.gnome.enable =
     lib.mkOption {
-      description = lib.mdDoc "Whether to style GNOME and GDM";
+      description = lib.mdDoc "Whether to style GNOME";
       type = lib.types.bool;
       default = config.stylix.autoEnable 
-             && config.services.xserver.desktopManager.gnome.enable;
+             && (config.services.xserver.desktopManager.gnome.enable or false);
     };
 
   config = lib.mkIf config.stylix.targets.gnome.enable {
