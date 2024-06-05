@@ -1,7 +1,5 @@
 { pkgs, config, lib, ... }:
 
-with config.lib.stylix.colors;
-
 {
   options.stylix.targets.nixos-icons.enable =
     config.lib.stylix.mkEnableTarget "the NixOS logo" true;
