@@ -11,7 +11,8 @@ with lib;
       example = false;
     };
 
-  config.lib.stylix.mkEnableTarget =
+  config = {
+  lib.stylix.mkEnableTarget =
     humanName:
 
     # If the module only touches options under its target (programs.target.*)
@@ -31,4 +32,5 @@ with lib;
       // optionalAttrs autoEnable {
         defaultText = literalExpression "stylix.autoEnable";
       };
+};
 }
