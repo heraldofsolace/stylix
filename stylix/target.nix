@@ -1,36 +1,48 @@
-{ config, lib, ... }@args:
-
-with lib;
+{ config, lib, ... }:
 
 {
-  options.stylix.autoEnable =
-    mkEnableOption
-    "styling installed targets"
-    // {
-      default = import ./fromos.nix { inherit lib args; } [ "autoEnable" ] true;
-      example = false;
+  options.stylix = {
+    enable = lib.mkOption {
+      description = ''
+        Whether to enable Stylix.
+
+        When this is `false`, all theming is disabled and all other options
+        are ignored.
+      '';
+      type = lib.types.bool;
+      default = false;
+      example = true;
     };
 
-  config = {
-  lib.stylix.mkEnableTarget =
-    humanName:
+    autoEnable = lib.mkOption {
+      description = ''
+        Whether to enable targets by default.
 
-    # If the module only touches options under its target (programs.target.*)
-    # then this can simply be `true`, as those options are already gated by the
-    # upstream enable option.
-    #
-    # Otherwise, use `config` to check whether the target is enabled.
-    #
-    # If some manual setup is required, or the module leads to the target
-    # being installed if it wasn't already, set this to `false`.
+        When this is `false`, all targets are disabled unless explicitly enabled.
+
+        When this is `true`, most targets are enabled by default. A small number
+        remain off by default, because they require further manual setup, or
+        they are only applicable in specific circumstances which cannot be
+        detected automatically.
+      '';
+      type = lib.types.bool;
+      default = true;
+      example = false;
+    };
+  };
+
+  config.lib.stylix.mkEnableTarget = let
+    cfg = config.stylix;
+  in
+    humanName:
     autoEnable:
-      mkEnableOption
-      "styling for ${humanName}"
+      lib.mkEnableOption
+      "theming for ${humanName}"
       // {
-        default = config.stylix.autoEnable && autoEnable;
+        default = cfg.enable && cfg.autoEnable && autoEnable;
+        example = !autoEnable;
       }
-      // optionalAttrs autoEnable {
-        defaultText = literalExpression "stylix.autoEnable";
+      // lib.optionalAttrs autoEnable {
+        defaultText = lib.literalMD "same as [`stylix.autoEnable`](#stylixautoenable)";
       };
-};
 }
