@@ -1,4 +1,9 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 
 {
   options.stylix.targets.nixos-icons.enable =
@@ -23,5 +28,4 @@
     #   });
     # })];
   };
-
 }

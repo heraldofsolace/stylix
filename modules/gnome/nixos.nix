@@ -1,26 +1,37 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 
 let
   theme = pkgs.callPackage ./theme.nix {
     inherit (config.lib.stylix) colors templates;
   };
 
-in {
+in
+{
   options.stylix.targets.gnome.enable =
     config.lib.stylix.mkEnableTarget "GNOME and GDM" true;
 
-  config = lib.mkIf (
-    config.stylix.enable
-    && config.stylix.targets.gnome.enable
-    && config.services.xserver.desktopManager.gnome.enable
-  ) {
-    # As Stylix is controlling the wallpaper, there is no need for this
-    # pack of default wallpapers to be installed.
-    # If you want to use one, you can set stylix.image to something like
-    # "${pkgs.gnome.gnome-backgrounds}/path/to/your/preferred/background"
-    # which will then download the pack regardless of its exclusion below.
-    environment.gnome.excludePackages = [ pkgs.gnome.gnome-backgrounds ];
-
+  config =
+    lib.mkIf
+      (
+        config.stylix.enable
+        && config.stylix.targets.gnome.enable
+        && (
+          config.services.xserver.desktopManager.gnome.enable
+          || config.services.xserver.displayManager.gdm.enable
+        )
+      )
+      {
+        # As Stylix is controlling the wallpaper, there is no need for this
+        # pack of default wallpapers to be installed.
+        # If you want to use one, you can set stylix.image to something like
+        # "${pkgs.gnome-backgrounds}/path/to/your/preferred/background"
+        # which will then download the pack regardless of its exclusion below.
+        environment.gnome.excludePackages = [ pkgs.gnome-backgrounds ];
     # nixpkgs.overlays = [(self: super: {
     #   gnome = super.gnome.overrideScope (gnomeSelf: gnomeSuper: {
     #     gnome-shell = gnomeSuper.gnome-shell.overrideAttrs (oldAttrs: {
@@ -38,15 +49,17 @@ in {
     #   });
     # })];
 
-    # Cursor settings are usually applied via Home Manager,
-    # but the login screen uses a separate database.
-    environment.systemPackages = [ config.stylix.cursor.package ];
-    programs.dconf.profiles.gdm.databases = [{
-      lockAll = true;
-      settings."org/gnome/desktop/interface" = {
-        cursor-theme = config.stylix.cursor.name;
-        cursor-size = lib.gvariant.mkInt32 config.stylix.cursor.size;
+        # Cursor settings are usually applied via Home Manager,
+        # but the login screen uses a separate database.
+        environment.systemPackages = [ config.stylix.cursor.package ];
+        programs.dconf.profiles.gdm.databases = [
+          {
+            lockAll = true;
+            settings."org/gnome/desktop/interface" = {
+              cursor-theme = config.stylix.cursor.name;
+              cursor-size = lib.gvariant.mkInt32 config.stylix.cursor.size;
+            };
+          }
+        ];
       };
-    }];
-  };
 }

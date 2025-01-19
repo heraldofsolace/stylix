@@ -3,9 +3,11 @@
   lib,
   ...
 }:
-with config.stylix.fonts; let
+with config.stylix.fonts;
+let
   colors = config.lib.stylix.colors.withHashtag;
-in {
+in
+{
   options.stylix.targets.wofi.enable =
     config.lib.stylix.mkEnableTarget "wofi" config.programs.wofi.enable;
 
@@ -13,7 +15,7 @@ in {
     programs.wofi.style = with colors; ''
       window {
         font-family: "${monospace.name}";
-        font-size: ${toString sizes.popups};
+        font-size: ${toString sizes.popups}pt;
 
         background-color: ${base00};
         color: ${base05};
